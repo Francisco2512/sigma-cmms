@@ -9,14 +9,13 @@ automática, inventario de refacciones y un tablero con MTBF, MTTR y disponibili
 
 ```
 Angular 20 (SPA)  ──HTTP/JSON + JWT──▶  Spring Boot 4.1 (API REST)  ──JPA/Flyway──▶  MySQL 9
- frontend/                               backend/                                    database/
+ frontend/                               backend/
 ```
 
 - **Backend** en capas: `controller` → `services` → `repositories` → `model`. Las transiciones
   de estado de una orden viven en la entidad `WorkOrder`; el consumo de refacciones usa
   bloqueo pesimista (`SELECT ... FOR UPDATE`) para evitar sobreconsumo concurrente.
 - **Frontend** con componentes standalone, signals, `OnPush` y carga diferida por ruta.
-- Decisiones de arquitectura en [`docs/adr`](docs/adr).
 
 ## Requisitos
 
@@ -29,17 +28,22 @@ Angular 20 (SPA)  ──HTTP/JSON + JWT──▶  Spring Boot 4.1 (API REST)  �
 
 ## Puesta en marcha
 
-1. **Secretos locales** (crea `backend/.env` y `database/setup-local.sql`, ignorados por git):
+1. **Base de datos.** Con un usuario administrador de MySQL:
 
-   ```bash
-   python scripts/init_local_env.py
+   ```sql
+   CREATE DATABASE sigma_cmms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   CREATE DATABASE sigma_cmms_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   CREATE USER 'sigma'@'localhost' IDENTIFIED BY 'la-contrasena-que-elija';
+   GRANT ALL PRIVILEGES ON sigma_cmms.* TO 'sigma'@'localhost';
+   GRANT ALL PRIVILEGES ON sigma_cmms_test.* TO 'sigma'@'localhost';
    ```
 
-2. **Base de datos** (pide la contraseña de root de MySQL):
+   El esquema (tablas, índices y restricciones) lo crea Flyway al arrancar el backend, a partir de
+   `backend/src/main/resources/db/migration/V1__esquema_inicial.sql`.
 
-   ```bash
-   mysql -u root -p < database/setup-local.sql
-   ```
+2. **Secretos locales.** Copie `backend/.env.example` como `backend/.env` y complete los valores:
+   la contraseña de la base, una clave JWT de al menos 32 caracteres y la contraseña de los
+   usuarios de demostración. El archivo `.env` está ignorado por git.
 
 3. **Backend** (Flyway crea el esquema y se cargan datos de demostración):
 
