@@ -1,0 +1,45 @@
+<div class="page-head">
+  <div>
+    <h1>Órdenes de trabajo</h1>
+    <p>{{ result()?.totalElements ?? 0 }} órdenes · ordenadas por fecha compromiso</p>
+  </div>
+  @if (canCreate) {
+    <a routerLink="new" class="btn btn-accent" data-testid="new-order"><app-icon name="plus" [size]="18" />
+      {{ auth.user()?.role === 'TECNICO' ? 'Reportar falla' : 'Nueva orden' }}</a>
+  }
+</div>
+
+<div class="card">
+  <div class="filters">
+    <select class="input" [ngModel]="status()" (ngModelChange)="status.set($event); applyFilters()" aria-label="Estatus"
+            data-testid="filter-status">
+      <option value="">Todos los estatus</option>
+      @for (entry of statuses; track entry[0]) {
+        <option [value]="entry[0]">{{ entry[1] }}</option>
+      }
+    </select>
+    <select class="input" [ngModel]="type()" (ngModelChange)="type.set($event); applyFilters()" aria-label="Tipo">
+      <option value="">Correctivas y preventivas</option>
+      <option value="CORRECTIVA">Correctivas</option>
+      <option value="PREVENTIVA">Preventivas</option>
+    </select>
+    <label class="toggle">
+      <input type="checkbox" [ngModel]="mine()" (ngModelChange)="mine.set($event); applyFilters()" data-testid="filter-mine" />
+      Solo asignadas a mí
+    </label>
+  </div>
+
+  @if (result(); as page) {
+    <app-work-order-table [orders]="page.content" />
+    @if (page.totalPages > 1) {
+      <div class="pager">
+        <button type="button" class="btn btn-secondary" [disabled]="page.number === 0" (click)="goTo(page.number - 1)">Anterior</button>
+        <span>Página {{ page.number + 1 }} de {{ page.totalPages }}</span>
+        <button type="button" class="btn btn-secondary" [disabled]="page.number + 1 >= page.totalPages"
+                (click)="goTo(page.number + 1)">Siguiente</button>
+      </div>
+    }
+  } @else if (loading()) {
+    <p class="empty">Cargando órdenes…</p>
+  }
+</div>

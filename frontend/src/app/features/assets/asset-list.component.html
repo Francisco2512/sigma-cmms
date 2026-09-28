@@ -1,0 +1,49 @@
+<div class="page-head">
+  <div>
+    <h1>Activos</h1>
+    <p>{{ result()?.totalElements ?? 0 }} equipos registrados</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="filters">
+    <input class="input" type="search" placeholder="Buscar por código o nombre" [ngModel]="search()"
+           (ngModelChange)="search.set($event)" (keyup.enter)="load(0)" data-testid="asset-search" />
+    <select class="input" [ngModel]="status()" (ngModelChange)="status.set($event); load(0)" aria-label="Estado">
+      <option value="">Todos los estados</option>
+      <option value="OPERATIVO">Operativo</option>
+      <option value="EN_MANTENIMIENTO">En mantenimiento</option>
+      <option value="FUERA_DE_SERVICIO">Fuera de servicio</option>
+    </select>
+    <button type="button" class="btn btn-secondary" (click)="load(0)">Buscar</button>
+  </div>
+
+  @if (result(); as page) {
+    <div class="table-wrap">
+      <table class="table" data-testid="assets-table">
+        <thead><tr><th>Código</th><th>Nombre</th><th>Área</th><th>Criticidad</th><th>Estado</th><th>Fabricante</th></tr></thead>
+        <tbody>
+          @for (asset of page.content; track asset.id) {
+            <tr class="row-link" [routerLink]="['/assets', asset.id]">
+              <td class="code"><a [routerLink]="['/assets', asset.id]">{{ asset.code }}</a></td>
+              <td>{{ asset.name }}</td>
+              <td>{{ asset.area }}</td>
+              <td><app-badge [label]="levelLabels[asset.criticality]" [tone]="levelTones[asset.criticality]" /></td>
+              <td><app-badge [label]="assetStatus[asset.status].label" [tone]="assetStatus[asset.status].tone" /></td>
+              <td class="muted">{{ asset.manufacturer ?? '—' }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty">Sin resultados</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (page.totalPages > 1) {
+      <div class="pager">
+        <button type="button" class="btn btn-secondary" [disabled]="page.number === 0" (click)="load(page.number - 1)">Anterior</button>
+        <span>Página {{ page.number + 1 }} de {{ page.totalPages }}</span>
+        <button type="button" class="btn btn-secondary" [disabled]="page.number + 1 >= page.totalPages" (click)="load(page.number + 1)">Siguiente</button>
+      </div>
+    }
+  }
+</div>

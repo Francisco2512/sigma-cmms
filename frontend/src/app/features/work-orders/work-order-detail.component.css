@@ -1,0 +1,10 @@
+.back { display: inline-block; margin-bottom: 8px; text-decoration: none; font-weight: 600; }
+.page-head p { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 16px; align-items: start; }
+.actions { display: grid; gap: 16px; }
+.actions .card + .card { margin-top: 0; }
+.actions .input { margin-bottom: 10px; }
+.block { width: 100%; }
+.text { margin: 16px 0 0; line-height: 1.55; }
+.sub { font-size: 14px; margin: 22px 0 8px; }
+@media (max-width: 960px) { .layout { grid-template-columns: 1fr; } }

@@ -1,0 +1,11 @@
+.bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+li { display: grid; grid-template-columns: 90px 1fr 40px; align-items: center; gap: 10px; }
+.label { font-size: 13px; color: var(--text-muted); }
+.track { height: 10px; border-radius: 5px; background: var(--neutral-soft); overflow: hidden; }
+.fill { display: block; height: 100%; border-radius: 5px; min-width: 2px; }
+.tone-info { background: var(--info-strong); }
+.tone-warning { background: var(--accent); }
+.tone-progress { background: var(--progress-strong); }
+.tone-success { background: var(--success-strong); }
+.tone-neutral { background: #9aa7b4; }
+.total { text-align: right; font-variant-numeric: tabular-nums; }

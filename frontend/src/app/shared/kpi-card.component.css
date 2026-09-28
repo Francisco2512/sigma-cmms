@@ -1,0 +1,8 @@
+.kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; border-top: 4px solid var(--primary); min-width: 0; }
+.kpi-good { border-top-color: var(--success-strong); }
+.kpi-alert { border-top-color: var(--accent); }
+.kpi-label { margin: 0; font-size: 13px; color: var(--text-muted); font-weight: 600; }
+.kpi-value { margin: 6px 0 0; font-size: 28px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.kpi-unit { font-size: 15px; font-weight: 600; color: var(--text-muted); margin-left: 4px; }
+.kpi-empty { font-size: 18px; color: var(--text-muted); }
+.kpi-hint { margin: 4px 0 0; font-size: 12px; color: var(--text-muted); }

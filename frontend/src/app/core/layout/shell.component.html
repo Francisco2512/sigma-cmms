@@ -1,0 +1,41 @@
+<div class="shell" [class.menu-open]="menuOpen()">
+  <header class="topbar">
+    <button type="button" class="menu-btn" (click)="toggleMenu()" aria-label="Abrir menú" data-testid="menu-toggle">
+      <app-icon name="menu" />
+    </button>
+    <span class="brand-small">SIGMA</span>
+  </header>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">Σ</span>
+      <div>
+        <strong>SIGMA</strong>
+        <small>Gestión de mantenimiento</small>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Principal">
+      @for (item of items(); track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active" (click)="menuOpen.set(false)" [attr.data-testid]="'nav-' + item.icon">
+          <app-icon [name]="item.icon" />
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+    <div class="user">
+      <span class="avatar">{{ initials() }}</span>
+      <div class="user-text">
+        <strong data-testid="current-user">{{ auth.user()?.fullName }}</strong>
+        <small>{{ roleLabel() }}</small>
+      </div>
+      <button type="button" class="logout" (click)="auth.logout()" title="Cerrar sesión" data-testid="logout">
+        <app-icon name="logout" [size]="18" />
+      </button>
+    </div>
+  </aside>
+
+  <div class="backdrop" (click)="menuOpen.set(false)"></div>
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

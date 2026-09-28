@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="SIGMA"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+  <description>Reglas de analisis estatico de SIGMA. Exclusiones justificadas en docs/adr/003.</description>
+  <rule ref="category/java/bestpractices.xml">
+    <!-- SLF4J parametrizado ya difiere el formateo; ver ADR 003 -->
+    <exclude name="GuardLogStatement"/>
+  </rule>
+  <rule ref="category/java/errorprone.xml"/>
+  <rule ref="category/java/security.xml"/>
+  <rule ref="category/java/performance.xml"/>
+</ruleset>

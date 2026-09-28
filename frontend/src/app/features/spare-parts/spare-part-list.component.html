@@ -1,0 +1,62 @@
+<div class="page-head">
+  <div>
+    <h1>Refacciones</h1>
+    <p>Existencias actualizadas con cada orden cerrada</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="filters">
+    <input class="input" type="search" placeholder="Buscar por SKU o nombre" [ngModel]="search()"
+           (ngModelChange)="search.set($event)" (keyup.enter)="load(0)" />
+    <label class="toggle">
+      <input type="checkbox" [ngModel]="onlyAlerts()" (ngModelChange)="onlyAlerts.set($event); load(0)" data-testid="filter-alerts" />
+      Solo en punto de reorden
+    </label>
+    <button type="button" class="btn btn-secondary" (click)="load(0)">Buscar</button>
+  </div>
+
+  @if (result(); as page) {
+    <div class="table-wrap">
+      <table class="table" data-testid="parts-table">
+        <thead>
+          <tr><th>SKU</th><th>Refacción</th><th class="num">Existencia</th><th class="num">Reorden</th>
+            <th class="num">Costo unitario</th><th>Alerta</th>@if (canRestock) { <th class="num">Entrada</th> }</tr>
+        </thead>
+        <tbody>
+          @for (part of page.content; track part.id) {
+            <tr [attr.data-testid]="'part-' + part.sku">
+              <td class="code">{{ part.sku }}</td>
+              <td>{{ part.name }}</td>
+              <td class="num"><strong>{{ part.stock }}</strong> <span class="muted">{{ part.unit }}</span></td>
+              <td class="num">{{ part.reorderPoint }}</td>
+              <td class="num">{{ part.unitCost | currency: 'MXN' : 'symbol-narrow' }}</td>
+              <td>
+                @if (part.belowReorderPoint) { <app-badge label="Reabastecer" tone="danger" /> }
+                @else { <app-badge label="Suficiente" tone="success" /> }
+              </td>
+              @if (canRestock) {
+                <td>
+                  <div class="restock">
+                    <input type="number" min="1" class="input" aria-label="Cantidad" [ngModel]="quantities()[part.id] || null"
+                           (ngModelChange)="setQuantity(part.id, $event)" />
+                    <button type="button" class="btn btn-secondary" (click)="restock(part)">Registrar</button>
+                  </div>
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="empty">Sin resultados</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (page.totalPages > 1) {
+      <div class="pager">
+        <button type="button" class="btn btn-secondary" [disabled]="page.number === 0" (click)="load(page.number - 1)">Anterior</button>
+        <span>Página {{ page.number + 1 }} de {{ page.totalPages }}</span>
+        <button type="button" class="btn btn-secondary" [disabled]="page.number + 1 >= page.totalPages" (click)="load(page.number + 1)">Siguiente</button>
+      </div>
+    }
+  }
+</div>

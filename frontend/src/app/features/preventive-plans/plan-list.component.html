@@ -1,0 +1,61 @@
+<div class="page-head">
+  <div>
+    <h1>Planes preventivos</h1>
+    <p>Las órdenes se generan cada día a las 06:00; también puede generarlas ahora.</p>
+  </div>
+  <div class="head-actions">
+    <button type="button" class="btn btn-secondary" (click)="openForm()" data-testid="new-plan"><app-icon name="plus" [size]="18" /> Nuevo plan</button>
+    <button type="button" class="btn btn-accent" [disabled]="busy()" (click)="generate()" data-testid="generate">Generar órdenes vencidas</button>
+  </div>
+</div>
+
+@if (lastRun(); as run) {
+  <div class="card result" data-testid="generation-result">
+    <strong>{{ run.generated }} órdenes generadas</strong>
+    @if (run.skippedCycles > 0) { <span class="muted"> · {{ run.skippedCycles }} ciclos vencidos omitidos</span> }
+    @if (run.orders.length > 0) {
+      <ul>
+        @for (order of run.orders; track order.id) {
+          <li><a [routerLink]="['/work-orders', order.id]" class="code">{{ order.code }}</a> {{ order.title }} · {{ order.assetCode }}</li>
+        }
+      </ul>
+    }
+  </div>
+}
+
+@if (showForm()) {
+  <div class="card">
+    <h2 class="card-title">Nuevo plan preventivo</h2>
+    <app-plan-form [assets]="assets()" [busy]="busy()" (saved)="create($event)" (cancelled)="showForm.set(false)" />
+  </div>
+}
+
+<div class="card">
+  <div class="table-wrap">
+    <table class="table" data-testid="plans-table">
+      <thead>
+        <tr><th>Plan</th><th>Activo</th><th class="num">Frecuencia</th><th>Próximo vencimiento</th><th>Prioridad</th><th>Estado</th><th></th></tr>
+      </thead>
+      <tbody>
+        @for (plan of plans(); track plan.id) {
+          <tr>
+            <td><strong>{{ plan.name }}</strong><br /><span class="muted">{{ plan.taskDescription }}</span></td>
+            <td><a [routerLink]="['/assets', plan.assetId]" class="code">{{ plan.assetCode }}</a></td>
+            <td class="num">cada {{ plan.frequencyDays }} días</td>
+            <td [class.overdue]="plan.due && plan.status === 'ACTIVO'">
+              {{ plan.nextDueDate | date: 'dd MMM yyyy' }}@if (plan.due && plan.status === 'ACTIVO') { · vence }
+            </td>
+            <td><app-badge [label]="levelLabels[plan.priority]" [tone]="levelTones[plan.priority]" /></td>
+            <td><app-badge [label]="plan.status === 'ACTIVO' ? 'Activo' : 'Pausado'" [tone]="plan.status === 'ACTIVO' ? 'success' : 'neutral'" /></td>
+            <td class="num">
+              <button type="button" class="btn btn-secondary" [disabled]="busy()" (click)="toggle(plan)">
+                {{ plan.status === 'ACTIVO' ? 'Pausar' : 'Activar' }}</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="7" class="empty">No hay planes registrados</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

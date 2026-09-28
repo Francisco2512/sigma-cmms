@@ -1,0 +1,38 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate data-testid="plan-form">
+  <div class="form-grid">
+    <div class="field">
+      <label for="plan-name">Nombre *</label>
+      <input id="plan-name" class="input" formControlName="name" maxlength="120" placeholder="Ej. Cambio de filtros" />
+    </div>
+    <div class="field">
+      <label for="plan-asset">Activo *</label>
+      <select id="plan-asset" class="input" formControlName="assetId">
+        <option [ngValue]="0" disabled>Seleccione un activo</option>
+        @for (asset of assets(); track asset.id) { <option [ngValue]="asset.id">{{ asset.code }} · {{ asset.name }}</option> }
+      </select>
+    </div>
+    <div class="field">
+      <label for="plan-frequency">Frecuencia (días) *</label>
+      <input id="plan-frequency" type="number" min="1" max="730" class="input" formControlName="frequencyDays" />
+    </div>
+    <div class="field">
+      <label for="plan-next">Primer vencimiento *</label>
+      <input id="plan-next" type="date" class="input" formControlName="nextDueDate" />
+    </div>
+    <div class="field">
+      <label for="plan-priority">Prioridad *</label>
+      <select id="plan-priority" class="input" formControlName="priority">
+        <option value="ALTA">Alta</option><option value="MEDIA">Media</option><option value="BAJA">Baja</option>
+      </select>
+    </div>
+    <div class="field field-full">
+      <label for="plan-task">Tareas a realizar *</label>
+      <textarea id="plan-task" class="input" formControlName="taskDescription" maxlength="1000"></textarea>
+    </div>
+  </div>
+  @if (form.touched && form.invalid) { <p class="field-error">Revise los campos obligatorios.</p> }
+  <div class="form-actions">
+    <button type="button" class="btn btn-secondary" (click)="cancelled.emit()">Cancelar</button>
+    <button type="submit" class="btn btn-primary" [disabled]="busy()">Guardar plan</button>
+  </div>
+</form>

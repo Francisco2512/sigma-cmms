@@ -1,0 +1,4 @@
+.parts-title { font-size: 14px; margin: 18px 0 10px; }
+.parts { display: grid; gap: 8px; margin-bottom: 10px; }
+.part-row { display: grid; grid-template-columns: 1fr 96px auto; gap: 8px; }
+.qty { text-align: right; }

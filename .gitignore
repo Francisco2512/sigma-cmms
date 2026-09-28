@@ -1,0 +1,22 @@
+# Secretos locales
+.env
+*.env
+!.env.example
+database/setup-local.sql
+
+# Build
+backend/target/
+frontend/dist/
+frontend/.angular/
+node_modules/
+coverage/
+
+# IDE y sistema
+.idea/
+.vscode/settings.json
+*.iml
+*.log
+*.class
+*.jar
+.DS_Store
+Thumbs.db

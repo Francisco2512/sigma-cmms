@@ -1,0 +1,42 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate data-testid="close-form">
+  <div class="form-grid">
+    <div class="field">
+      <label for="hours">Horas de mano de obra *</label>
+      <input id="hours" type="number" step="0.25" min="0.25" class="input" formControlName="laborHours" data-testid="close-hours" />
+    </div>
+    <div class="field field-full">
+      <label for="notes">Trabajo realizado *</label>
+      <textarea id="notes" class="input" formControlName="resolutionNotes" maxlength="1000"
+                placeholder="Causa encontrada y acción correctiva" data-testid="close-notes"></textarea>
+      @if (form.controls.resolutionNotes.touched && form.controls.resolutionNotes.invalid) {
+        <span class="field-error">Describa el trabajo realizado</span>
+      }
+    </div>
+  </div>
+
+  <h3 class="parts-title">Refacciones consumidas</h3>
+  <div formArrayName="parts" class="parts">
+    @for (row of parts.controls; track $index; let i = $index) {
+      <div class="part-row" [formGroupName]="i">
+        <select class="input" formControlName="sparePartId" [attr.data-testid]="'part-select-' + i" aria-label="Refacción">
+          <option [ngValue]="0" disabled>Seleccione una refacción</option>
+          @for (part of catalog(); track part.id) {
+            <option [ngValue]="part.id">{{ part.sku }} · {{ part.name }} (exist. {{ part.stock }})</option>
+          }
+        </select>
+        <input type="number" min="1" class="input qty" formControlName="quantity" aria-label="Cantidad"
+               [attr.data-testid]="'part-qty-' + i" />
+        <button type="button" class="btn btn-secondary" (click)="removePart(i)" aria-label="Quitar">×</button>
+      </div>
+    } @empty {
+      <p class="muted">Sin refacciones. Agregue las que se hayan usado.</p>
+    }
+  </div>
+  <button type="button" class="btn btn-secondary" (click)="addPart()" data-testid="add-part">+ Agregar refacción</button>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary" [disabled]="busy()" data-testid="close-submit">
+      {{ busy() ? 'Cerrando…' : 'Cerrar orden' }}
+    </button>
+  </div>
+</form>

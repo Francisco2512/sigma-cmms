@@ -1,0 +1,11 @@
+<article class="kpi" [class.kpi-good]="tone() === 'good'" [class.kpi-alert]="tone() === 'alert'" data-testid="kpi-card">
+  <p class="kpi-label">{{ label() }}</p>
+  @if (value() !== null) {
+    <p class="kpi-value" data-testid="kpi-value">{{ value() | number: format() }}<span class="kpi-unit">{{ unit() }}</span></p>
+  } @else {
+    <p class="kpi-value kpi-empty" data-testid="kpi-value">Sin datos</p>
+  }
+  @if (hint()) {
+    <p class="kpi-hint">{{ hint() }}</p>
+  }
+</article>

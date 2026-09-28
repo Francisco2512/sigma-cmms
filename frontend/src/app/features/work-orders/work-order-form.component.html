@@ -1,0 +1,69 @@
+<div class="page-head">
+  <div>
+    <h1>{{ isPlanner ? 'Nueva orden de trabajo' : 'Reportar falla' }}</h1>
+    <p>Los campos marcados con * son obligatorios</p>
+  </div>
+</div>
+
+<form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="form-grid">
+    <div class="field">
+      <label for="asset">Activo *</label>
+      <select id="asset" class="input" formControlName="assetId" data-testid="order-asset">
+        <option [ngValue]="0" disabled>Seleccione un activo</option>
+        @for (asset of assets(); track asset.id) {
+          <option [ngValue]="asset.id">{{ asset.code }} · {{ asset.name }}</option>
+        }
+      </select>
+      @if (form.controls.assetId.touched && form.controls.assetId.invalid) {
+        <span class="field-error">Seleccione el activo afectado</span>
+      }
+    </div>
+    <div class="field">
+      <label for="type">Tipo *</label>
+      <select id="type" class="input" formControlName="type">
+        <option value="CORRECTIVA">Correctiva</option>
+        <option value="PREVENTIVA">Preventiva</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="priority">Prioridad *</label>
+      <select id="priority" class="input" formControlName="priority" data-testid="order-priority">
+        <option value="ALTA">Alta</option><option value="MEDIA">Media</option><option value="BAJA">Baja</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="dueDate">Fecha compromiso *</label>
+      <input id="dueDate" type="date" class="input" formControlName="dueDate" />
+    </div>
+    <div class="field field-full">
+      <label for="title">Título *</label>
+      <input id="title" class="input" formControlName="title" maxlength="150" placeholder="Ej. Fuga de aceite en reductor"
+             data-testid="order-title" />
+      @if (form.controls.title.touched && form.controls.title.invalid) {
+        <span class="field-error">Describa brevemente la falla o trabajo</span>
+      }
+    </div>
+    <div class="field field-full">
+      <label for="description">Descripción</label>
+      <textarea id="description" class="input" formControlName="description" maxlength="1000"></textarea>
+    </div>
+    @if (isPlanner) {
+      <div class="field">
+        <label for="assignee">Asignar a</label>
+        <select id="assignee" class="input" formControlName="assignedToId" data-testid="order-assignee">
+          <option [ngValue]="0">Sin asignar</option>
+          @for (tech of technicians(); track tech.id) {
+            <option [ngValue]="tech.id">{{ tech.fullName }}</option>
+          }
+        </select>
+      </div>
+    }
+  </div>
+  <div class="form-actions">
+    <a routerLink="/work-orders" class="btn btn-secondary">Cancelar</a>
+    <button type="submit" class="btn btn-primary" [disabled]="saving()" data-testid="order-submit">
+      {{ saving() ? 'Guardando…' : 'Crear orden' }}
+    </button>
+  </div>
+</form>

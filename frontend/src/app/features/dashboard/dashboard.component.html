@@ -1,0 +1,47 @@
+<div class="page-head">
+  <div>
+    <h1>Tablero de mantenimiento</h1>
+    @if (kpis(); as k) {
+      <p>Últimos {{ k.periodDays }} días · {{ k.from }} a {{ k.to }}</p>
+    }
+  </div>
+  <div class="periods" role="group" aria-label="Periodo">
+    @for (period of periods; track period) {
+      <button type="button" class="btn" [class.btn-primary]="days() === period" [class.btn-secondary]="days() !== period"
+              (click)="selectPeriod(period)" [attr.data-testid]="'period-' + period">{{ period }} días</button>
+    }
+  </div>
+</div>
+
+@if (kpis(); as k) {
+  <section class="kpi-grid" [class.dim]="loading()">
+    <app-kpi-card label="MTBF" [value]="k.mtbfHours" unit="h" hint="Tiempo medio entre fallas" tone="good" />
+    <app-kpi-card label="MTTR" [value]="k.mttrHours" unit="h" hint="Tiempo medio de reparación" />
+    <app-kpi-card label="Disponibilidad" [value]="k.availabilityPct" unit="%" hint="MTBF / (MTBF + MTTR)" tone="good" />
+    <app-kpi-card label="Cumplimiento preventivo" [value]="k.preventiveCompliancePct" unit="%"
+                  hint="Preventivos cerrados a tiempo" />
+  </section>
+
+  <section class="kpi-grid secondary">
+    <app-kpi-card label="Fallas en el periodo" [value]="k.failures" [decimals]="0" />
+    <app-kpi-card label="Órdenes pendientes" [value]="k.openOrders" [decimals]="0" />
+    <app-kpi-card label="Órdenes vencidas" [value]="k.overdueOrders" [decimals]="0"
+                  [tone]="k.overdueOrders > 0 ? 'alert' : 'default'" />
+    <app-kpi-card label="Refacciones en reorden" [value]="k.partsBelowReorder" [decimals]="0"
+                  [tone]="k.partsBelowReorder > 0 ? 'alert' : 'default'" />
+  </section>
+
+  <section class="panels">
+    <div class="card">
+      <h2 class="card-title">Activos con más fallas</h2>
+      <app-top-assets [assets]="k.topAssets" />
+    </div>
+    <div class="card">
+      <h2 class="card-title">Órdenes por estatus</h2>
+      <app-status-bars [counts]="k.ordersByStatus" />
+      <a routerLink="/work-orders" class="more">Ver órdenes →</a>
+    </div>
+  </section>
+} @else if (loading()) {
+  <p class="empty">Calculando indicadores…</p>
+}

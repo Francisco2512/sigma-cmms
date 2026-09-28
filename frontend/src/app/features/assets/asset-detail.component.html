@@ -1,0 +1,38 @@
+@if (asset(); as a) {
+  <div class="page-head">
+    <div>
+      <a routerLink="/assets" class="back">← Activos</a>
+      <h1><span class="code">{{ a.code }}</span> · {{ a.name }}</h1>
+    </div>
+    <app-badge [label]="assetStatus[a.status].label" [tone]="assetStatus[a.status].tone" />
+  </div>
+
+  <section class="card">
+    <h2 class="card-title">Ficha técnica</h2>
+    <dl class="facts" data-testid="asset-facts">
+      <div><dt>Área</dt><dd>{{ a.area }}</dd></div>
+      <div><dt>Ubicación</dt><dd>{{ a.location ?? '—' }}</dd></div>
+      <div><dt>Criticidad</dt><dd><app-badge [label]="levelLabels[a.criticality]" [tone]="levelTones[a.criticality]" /></dd></div>
+      <div><dt>Fabricante</dt><dd>{{ a.manufacturer ?? '—' }}</dd></div>
+      <div><dt>Modelo</dt><dd>{{ a.model ?? '—' }}</dd></div>
+      <div><dt>En servicio desde</dt><dd>{{ a.commissionedAt ? (a.commissionedAt | date: 'MMM yyyy') : '—' }}</dd></div>
+    </dl>
+  </section>
+
+  <section class="card">
+    <h2 class="card-title">Historial de intervenciones</h2>
+    @if (history(); as page) {
+      <app-work-order-table [orders]="page.content" [showAsset]="false" />
+      @if (page.totalPages > 1) {
+        <div class="pager">
+          <button type="button" class="btn btn-secondary" [disabled]="page.number === 0" (click)="loadHistory(page.number - 1)">Anterior</button>
+          <span>Página {{ page.number + 1 }} de {{ page.totalPages }}</span>
+          <button type="button" class="btn btn-secondary" [disabled]="page.number + 1 >= page.totalPages"
+                  (click)="loadHistory(page.number + 1)">Siguiente</button>
+        </div>
+      }
+    }
+  </section>
+} @else {
+  <p class="empty">Cargando activo…</p>
+}

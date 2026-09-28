@@ -1,0 +1,18 @@
+package com.sigma.cmms.dto;
+
+import java.util.List;
+import java.util.function.Function;
+import org.springframework.data.domain.Page;
+
+/**
+ * Pagina de resultados con los metadatos de paginacion por desplazamiento.
+ *
+ * @param <T> tipo de los elementos
+ */
+public record PageResponse<T>(List<T> content, long totalElements, int totalPages, int number, int size) {
+
+    public static <E, T> PageResponse<T> from(Page<E> page, Function<E, T> mapper) {
+        return new PageResponse<>(page.getContent().stream().map(mapper).toList(),
+                page.getTotalElements(), page.getTotalPages(), page.getNumber(), page.getSize());
+    }
+}

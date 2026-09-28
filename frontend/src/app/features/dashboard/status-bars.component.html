@@ -1,0 +1,9 @@
+<ul class="bars">
+  @for (row of rows(); track row.status) {
+    <li [attr.data-testid]="'bar-' + row.status">
+      <span class="label">{{ row.label }}</span>
+      <span class="track"><span class="fill" [class]="'fill tone-' + row.tone" [style.width.%]="row.pct"></span></span>
+      <strong class="total">{{ row.total }}</strong>
+    </li>
+  }
+</ul>

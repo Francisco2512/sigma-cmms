@@ -1,0 +1,25 @@
+@if (assets().length === 0) {
+  <p class="empty">Sin fallas registradas en el periodo.</p>
+} @else {
+  <div class="table-wrap">
+    <table class="table" data-testid="top-assets">
+      <thead>
+        <tr><th>Activo</th><th class="num">Fallas</th><th class="num">MTTR</th><th class="num">Disponibilidad</th></tr>
+      </thead>
+      <tbody>
+        @for (asset of assets(); track asset.assetId) {
+          <tr>
+            <td><a [routerLink]="['/assets', asset.assetId]" class="code">{{ asset.code }}</a>&nbsp;<span class="muted">{{ asset.name }}</span></td>
+            <td class="num"><strong>{{ asset.failures }}</strong></td>
+            <td class="num">{{ asset.mttrHours | number: '1.1-1' }} h</td>
+            <td class="num">
+              <span class="avail">{{ asset.availabilityPct | number: '1.1-1' }}%
+                <span class="track"><span class="fill" [style.width.%]="asset.availabilityPct"></span></span>
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

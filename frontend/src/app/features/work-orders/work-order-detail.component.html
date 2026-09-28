@@ -1,0 +1,85 @@
+@if (order(); as o) {
+  <div class="page-head">
+    <div>
+      <a routerLink="/work-orders" class="back">← Órdenes</a>
+      <h1><span class="code">{{ o.summary.code }}</span> · {{ o.summary.title }}</h1>
+      <p>
+        <app-badge [label]="statusLabels[o.summary.status]" [tone]="statusTones[o.summary.status]" />
+        <app-badge [label]="'Prioridad ' + levelLabels[o.summary.priority]" [tone]="levelTones[o.summary.priority]" />
+        <span class="muted">{{ o.summary.type === 'CORRECTIVA' ? 'Correctiva' : 'Preventiva' }}</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="layout">
+    <section class="card">
+      <h2 class="card-title">Datos de la orden</h2>
+      <dl class="facts" data-testid="order-facts">
+        <div><dt>Activo</dt><dd><a [routerLink]="['/assets', o.summary.assetId]">{{ o.summary.assetCode }}</a> · {{ o.summary.assetName }}</dd></div>
+        <div><dt>Responsable</dt><dd data-testid="order-assignee-name">{{ o.summary.assignedToName ?? 'Sin asignar' }}</dd></div>
+        <div><dt>Fecha compromiso</dt><dd [class.overdue]="o.summary.overdue">{{ o.summary.dueDate | date: 'dd MMM yyyy' }}</dd></div>
+        <div><dt>Creada por</dt><dd>{{ o.createdByName }}</dd></div>
+        @if (o.failureAt) { <div><dt>Falla reportada</dt><dd>{{ o.failureAt | date: 'dd MMM yyyy, HH:mm' }}</dd></div> }
+        @if (o.startedAt) { <div><dt>Inicio</dt><dd>{{ o.startedAt | date: 'dd MMM yyyy, HH:mm' }}</dd></div> }
+        @if (o.summary.closedAt) { <div><dt>Cierre</dt><dd>{{ o.summary.closedAt | date: 'dd MMM yyyy, HH:mm' }}</dd></div> }
+        @if (o.laborHours !== null) { <div><dt>Mano de obra</dt><dd>{{ o.laborHours | number: '1.2-2' }} h</dd></div> }
+      </dl>
+      @if (o.description) { <p class="text"><strong>Descripción.</strong> {{ o.description }}</p> }
+      @if (o.resolutionNotes) { <p class="text"><strong>Resolución.</strong> {{ o.resolutionNotes }}</p> }
+
+      @if (o.parts.length > 0) {
+        <h3 class="sub">Refacciones consumidas</h3>
+        <table class="table" data-testid="order-parts">
+          <thead><tr><th>SKU</th><th>Refacción</th><th class="num">Cant.</th><th class="num">Subtotal</th></tr></thead>
+          <tbody>
+            @for (line of o.parts; track line.sparePartId) {
+              <tr><td class="code">{{ line.sku }}</td><td>{{ line.name }}</td><td class="num">{{ line.quantity }}</td>
+                <td class="num">{{ line.subtotal | currency: 'MXN' : 'symbol-narrow' }}</td></tr>
+            }
+          </tbody>
+          <tfoot><tr><td colspan="3" class="num"><strong>Total</strong></td>
+            <td class="num"><strong>{{ o.partsCost | currency: 'MXN' : 'symbol-narrow' }}</strong></td></tr></tfoot>
+        </table>
+      }
+    </section>
+
+    <aside class="actions">
+      @if (canAssign()) {
+        <div class="card">
+          <h2 class="card-title">Asignar técnico</h2>
+          <select class="input" [ngModel]="technicianId()" (ngModelChange)="technicianId.set($event)" data-testid="assign-select">
+            <option [ngValue]="0" disabled>Seleccione</option>
+            @for (tech of technicians(); track tech.id) { <option [ngValue]="tech.id">{{ tech.fullName }}</option> }
+          </select>
+          <button type="button" class="btn btn-primary block" [disabled]="busy() || technicianId() === 0" (click)="assign()"
+                  data-testid="assign-submit">Asignar</button>
+        </div>
+      }
+      @if (canStart()) {
+        <div class="card">
+          <h2 class="card-title">Ejecución</h2>
+          <p class="muted">Al iniciar, el activo queda marcado en mantenimiento.</p>
+          <button type="button" class="btn btn-accent btn-lg block" [disabled]="busy()" (click)="start()" data-testid="start-order">
+            Iniciar trabajo</button>
+        </div>
+      }
+      @if (canClose()) {
+        <div class="card">
+          <h2 class="card-title">Cerrar orden</h2>
+          <app-close-order-form [catalog]="catalog()" [busy]="busy()" (closeRequested)="close($event)" />
+        </div>
+      }
+      @if (canCancel()) {
+        <div class="card">
+          <h2 class="card-title">Cancelar</h2>
+          <input class="input" placeholder="Motivo de la cancelación" maxlength="300" [ngModel]="cancelReason()"
+                 (ngModelChange)="cancelReason.set($event)" />
+          <button type="button" class="btn btn-danger block" [disabled]="busy() || !cancelReason().trim()" (click)="cancel()">
+            Cancelar orden</button>
+        </div>
+      }
+    </aside>
+  </div>
+} @else {
+  <p class="empty">Cargando orden…</p>
+}
