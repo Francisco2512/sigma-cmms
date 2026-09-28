@@ -46,6 +46,12 @@ public class SparePart extends BaseEntity {
         return stock <= reorderPoint;
     }
 
+    /**
+     * Descuenta la cantidad indicada de la existencia.
+     *
+     * @param quantity cantidad a consumir
+     * @throws BusinessRuleException si la existencia es insuficiente
+     */
     public void consume(int quantity) {
         if (quantity > stock) {
             throw new BusinessRuleException("Existencia insuficiente de " + sku + ": disponible "
@@ -54,6 +60,11 @@ public class SparePart extends BaseEntity {
         stock -= quantity;
     }
 
+    /**
+     * Suma una entrada de almacen a la existencia.
+     *
+     * @param quantity cantidad que ingresa
+     */
     public void restock(int quantity) {
         stock += quantity;
     }

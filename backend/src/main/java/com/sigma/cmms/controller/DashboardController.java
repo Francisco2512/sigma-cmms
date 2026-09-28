@@ -28,6 +28,12 @@ public class DashboardController {
 
     private final KpiService kpiService;
 
+    /**
+     * Calcula los indicadores del periodo: MTBF, MTTR, disponibilidad y cumplimiento preventivo.
+     *
+     * @param days ventana de observacion, entre 7 y 365 dias
+     * @return 200 con los indicadores y los activos con mas fallas
+     */
     @Operation(summary = "MTBF, MTTR, disponibilidad y cumplimiento preventivo del periodo")
     @ApiResponse(responseCode = "200", description = "Indicadores calculados")
     @PreAuthorize(Authz.CAN_PLAN)

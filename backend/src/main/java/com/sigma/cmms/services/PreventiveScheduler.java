@@ -16,6 +16,7 @@ public class PreventiveScheduler {
     private final PreventivePlanService planService;
     private final UserRepository userRepository;
 
+    /** Genera cada dia las ordenes de los planes preventivos vencidos. */
     @Scheduled(cron = "${sigma.preventive.cron}")
     public void generateDaily() {
         userRepository.findFirstByRoleOrderByIdAsc(Role.ADMIN).ifPresentOrElse(

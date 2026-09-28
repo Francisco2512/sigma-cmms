@@ -40,6 +40,7 @@ public class WorkOrderPart extends BaseEntity {
         this.unitCost = unitCost;
     }
 
+    /** @return costo de la linea: cantidad por costo unitario */
     public BigDecimal subtotal() {
         return unitCost.multiply(BigDecimal.valueOf(quantity));
     }

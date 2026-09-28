@@ -70,6 +70,10 @@ public class PreventivePlan extends BaseEntity {
         return Math.max(skipped, 0);
     }
 
+    /**
+     * @param today fecha de referencia
+     * @return verdadero si el plan esta activo y su vencimiento ya llego
+     */
     public boolean isDue(LocalDate today) {
         return status == PlanStatus.ACTIVO && !nextDueDate.isAfter(today);
     }

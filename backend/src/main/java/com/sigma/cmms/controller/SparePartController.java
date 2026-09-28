@@ -37,6 +37,12 @@ public class SparePartController {
 
     private final SparePartService sparePartService;
 
+    /**
+     * Busca refacciones por SKU o nombre.
+     *
+     * @param belowReorder si es verdadero, solo devuelve las que requieren reabasto
+     * @return 200 con una pagina de refacciones ordenada por nombre
+     */
     @Operation(summary = "Busca refacciones; belowReorder=true devuelve solo las que requieren reabasto")
     @ApiResponse(responseCode = "200", description = "Pagina de refacciones")
     @GetMapping
@@ -47,6 +53,12 @@ public class SparePartController {
         return ResponseEntity.ok(ApiResult.ok(sparePartService.search(search, belowReorder, pageable)));
     }
 
+    /**
+     * Da de alta una refaccion. Requiere rol de almacen.
+     *
+     * @param request datos de la refaccion
+     * @return 201 con la cabecera Location, o 409 si el SKU ya existe
+     */
     @Operation(summary = "Da de alta una refaccion")
     @ApiResponse(responseCode = "201", description = "Refaccion creada")
     @ApiResponse(responseCode = "409", description = "SKU duplicado")
@@ -59,6 +71,13 @@ public class SparePartController {
         return ResponseEntity.created(location).body(ApiResult.ok(created, "Refaccion registrada"));
     }
 
+    /**
+     * Registra una entrada de almacen sobre una refaccion. Requiere rol de almacen.
+     *
+     * @param sparePartId identificador de la refaccion
+     * @param request cantidad que ingresa
+     * @return 200 con la existencia actualizada
+     */
     @Operation(summary = "Registra una entrada de almacen")
     @ApiResponse(responseCode = "200", description = "Existencia actualizada")
     @PreAuthorize(Authz.CAN_STOCK)

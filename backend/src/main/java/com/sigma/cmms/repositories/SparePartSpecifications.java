@@ -10,6 +10,11 @@ public final class SparePartSpecifications {
     private SparePartSpecifications() {
     }
 
+    /**
+     * @param text texto libre a buscar en SKU o nombre
+     * @param onlyBelowReorder limita a las refacciones que requieren reabasto
+     * @return filtro combinado
+     */
     public static Specification<SparePart> search(String text, boolean onlyBelowReorder) {
         return Specification.allOf(matchesText(text), belowReorder(onlyBelowReorder));
     }

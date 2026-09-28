@@ -11,6 +11,13 @@ public final class WorkOrderSpecifications {
     private WorkOrderSpecifications() {
     }
 
+    /**
+     * @param status estatus a filtrar
+     * @param type tipo de orden
+     * @param assetId activo
+     * @param assignedToId tecnico asignado
+     * @return filtro combinado; los criterios nulos no restringen
+     */
     public static Specification<WorkOrder> withFilters(WorkOrderStatus status, WorkOrderType type, Long assetId,
             Long assignedToId) {
         return Specification.allOf(

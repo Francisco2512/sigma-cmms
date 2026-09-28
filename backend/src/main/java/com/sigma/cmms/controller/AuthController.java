@@ -31,6 +31,12 @@ public class AuthController {
     private final AuthService authService;
     private final UserService userService;
 
+    /**
+     * Valida las credenciales y emite un token de acceso.
+     *
+     * @param request usuario y contrasena
+     * @return 200 con el token, 401 si son invalidas o 429 si la cuenta esta bloqueada
+     */
     @Operation(summary = "Inicia sesion y devuelve un token JWT")
     @ApiResponse(responseCode = "200", description = "Credenciales validas")
     @ApiResponse(responseCode = "401", description = "Credenciales invalidas")
@@ -40,6 +46,12 @@ public class AuthController {
         return ResponseEntity.ok(ApiResult.ok(authService.login(request)));
     }
 
+    /**
+     * Devuelve los datos del usuario autenticado.
+     *
+     * @param jwt token de la peticion
+     * @return 200 con el usuario actual
+     */
     @Operation(summary = "Datos del usuario autenticado")
     @ApiResponse(responseCode = "200", description = "Usuario actual")
     @GetMapping("/me")

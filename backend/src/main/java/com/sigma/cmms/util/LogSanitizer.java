@@ -8,6 +8,12 @@ public class LogSanitizer {
 
     private static final int MAX_LENGTH = 100;
 
+    /**
+     * Limpia un texto antes de escribirlo en el log.
+     *
+     * @param value texto proveniente del usuario
+     * @return el texto sin saltos de linea y acotado en longitud
+     */
     public static String clean(String value) {
         if (value == null) {
             return "";

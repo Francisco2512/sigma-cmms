@@ -26,6 +26,12 @@ public class UserController {
 
     private final UserService userService;
 
+    /**
+     * Lista los usuarios de un rol, para asignar ordenes de trabajo.
+     *
+     * @param role rol a consultar; por omision, tecnicos
+     * @return 200 con los usuarios del rol
+     */
     @Operation(summary = "Lista usuarios por rol")
     @ApiResponse(responseCode = "200", description = "Usuarios del rol")
     @PreAuthorize(Authz.CAN_PLAN)

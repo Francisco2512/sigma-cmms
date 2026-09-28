@@ -37,6 +37,11 @@ public class PreventivePlanController {
 
     private final PreventivePlanService planService;
 
+    /**
+     * Lista los planes preventivos ordenados por fecha de vencimiento.
+     *
+     * @return 200 con los planes y su indicador de vencimiento
+     */
     @Operation(summary = "Lista los planes por fecha de vencimiento")
     @ApiResponse(responseCode = "200", description = "Planes")
     @GetMapping
@@ -44,6 +49,12 @@ public class PreventivePlanController {
         return ResponseEntity.ok(ApiResult.ok(planService.list()));
     }
 
+    /**
+     * Crea un plan preventivo activo. Requiere rol de planeacion.
+     *
+     * @param request datos del plan
+     * @return 201 con la cabecera Location
+     */
     @Operation(summary = "Crea un plan preventivo")
     @ApiResponse(responseCode = "201", description = "Plan creado")
     @PreAuthorize(Authz.CAN_PLAN)
@@ -55,6 +66,13 @@ public class PreventivePlanController {
         return ResponseEntity.created(location).body(ApiResult.ok(created, "Plan creado"));
     }
 
+    /**
+     * Activa o pausa un plan; un plan pausado deja de generar ordenes.
+     *
+     * @param planId identificador del plan
+     * @param request nuevo estatus
+     * @return 200 con el plan actualizado
+     */
     @Operation(summary = "Activa o pausa un plan")
     @ApiResponse(responseCode = "200", description = "Estatus actualizado")
     @PreAuthorize(Authz.CAN_PLAN)
@@ -64,6 +82,13 @@ public class PreventivePlanController {
         return ResponseEntity.ok(ApiResult.ok(planService.changeStatus(planId, request.status())));
     }
 
+    /**
+     * Genera de inmediato las ordenes de los planes vencidos. Es idempotente: ejecutarla
+     * dos veces el mismo dia no duplica ordenes.
+     *
+     * @param jwt token de quien solicita la generacion
+     * @return 200 con las ordenes generadas y los ciclos omitidos
+     */
     @Operation(summary = "Genera ahora las ordenes de los planes vencidos (normalmente corre cada dia)")
     @ApiResponse(responseCode = "200", description = "Resultado de la generacion")
     @PreAuthorize(Authz.CAN_PLAN)

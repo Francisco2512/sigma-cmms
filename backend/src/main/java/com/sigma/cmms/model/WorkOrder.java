@@ -36,7 +36,8 @@ import org.hibernate.type.SqlTypes;
 @Table(name = "sigma_work_orders")
 public class WorkOrder extends BaseEntity {
 
-    private static final Set<WorkOrderStatus> ASSIGNABLE = EnumSet.of(WorkOrderStatus.ABIERTA, WorkOrderStatus.ASIGNADA);
+    private static final Set<WorkOrderStatus> ASSIGNABLE =
+            EnumSet.of(WorkOrderStatus.ABIERTA, WorkOrderStatus.ASIGNADA);
 
     @Column(length = 20)
     private String code;
@@ -101,12 +102,24 @@ public class WorkOrder extends BaseEntity {
     @OneToMany(mappedBy = "workOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkOrderPart> parts = new ArrayList<>();
 
+    /**
+     * Asigna la orden a un tecnico.
+     *
+     * @param technician tecnico responsable
+     * @throws InvalidStateTransitionException si la orden ya inicio o termino
+     */
     public void assignTo(User technician) {
         requireStatus(ASSIGNABLE, "asignar");
         this.assignedTo = technician;
         this.status = WorkOrderStatus.ASIGNADA;
     }
 
+    /**
+     * Inicia la ejecucion y marca el activo como en mantenimiento.
+     *
+     * @param now momento de inicio
+     * @throws InvalidStateTransitionException si la orden no esta asignada
+     */
     public void start(LocalDateTime now) {
         requireStatus(EnumSet.of(WorkOrderStatus.ASIGNADA), "iniciar");
         this.startedAt = now;
@@ -114,6 +127,14 @@ public class WorkOrder extends BaseEntity {
         asset.setStatus(AssetStatus.EN_MANTENIMIENTO);
     }
 
+    /**
+     * Cierra la orden y devuelve el activo a operacion.
+     *
+     * @param now momento de cierre
+     * @param hours horas de mano de obra
+     * @param notes trabajo realizado
+     * @throws InvalidStateTransitionException si la orden no esta en proceso
+     */
     public void close(LocalDateTime now, BigDecimal hours, String notes) {
         requireStatus(EnumSet.of(WorkOrderStatus.EN_PROCESO), "cerrar");
         this.closedAt = now;
@@ -123,28 +144,50 @@ public class WorkOrder extends BaseEntity {
         asset.setStatus(AssetStatus.OPERATIVO);
     }
 
+    /**
+     * Cancela la orden y conserva el motivo en las notas.
+     *
+     * @param reason motivo de la cancelacion
+     * @throws InvalidStateTransitionException si la orden ya inicio
+     */
     public void cancel(String reason) {
         requireStatus(ASSIGNABLE, "cancelar");
         this.resolutionNotes = "Cancelada: " + reason;
         this.status = WorkOrderStatus.CANCELADA;
     }
 
+    /**
+     * Agrega una refaccion consumida, con el costo unitario del momento.
+     *
+     * @param part refaccion consumida
+     * @param quantity cantidad consumida
+     */
     public void addPart(SparePart part, int quantity) {
         parts.add(new WorkOrderPart(this, part, quantity, part.getUnitCost()));
     }
 
+    /** @return verdadero si la orden esta cerrada o cancelada */
     public boolean isFinished() {
         return status == WorkOrderStatus.CERRADA || status == WorkOrderStatus.CANCELADA;
     }
 
+    /**
+     * @param today fecha de referencia
+     * @return verdadero si sigue pendiente y su fecha compromiso ya paso
+     */
     public boolean isOverdue(LocalDate today) {
         return !isFinished() && dueDate.isBefore(today);
     }
 
+    /**
+     * @param userId identificador del usuario
+     * @return verdadero si la orden esta asignada a ese usuario
+     */
     public boolean isAssignedTo(Long userId) {
         return assignedTo != null && assignedTo.getId().equals(userId);
     }
 
+    /** @return costo total de las refacciones consumidas */
     public BigDecimal partsCost() {
         return parts.stream().map(WorkOrderPart::subtotal).reduce(BigDecimal.ZERO, BigDecimal::add);
     }

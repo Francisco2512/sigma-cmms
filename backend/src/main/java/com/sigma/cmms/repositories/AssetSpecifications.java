@@ -11,6 +11,12 @@ public final class AssetSpecifications {
     private AssetSpecifications() {
     }
 
+    /**
+     * @param text texto libre a buscar en codigo o nombre
+     * @param area area a filtrar
+     * @param status estatus a filtrar
+     * @return filtro combinado; los criterios nulos no restringen
+     */
     public static Specification<Asset> search(String text, String area, AssetStatus status) {
         return Specification.allOf(matchesText(text), inArea(area), hasStatus(status));
     }

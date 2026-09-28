@@ -55,6 +55,11 @@ public class LoginAttemptService {
         });
     }
 
+    /**
+     * Limpia el conteo de intentos tras un inicio de sesion correcto.
+     *
+     * @param username usuario que inicio sesion
+     */
     public void registerSuccess(String username) {
         attempts.remove(key(username));
     }

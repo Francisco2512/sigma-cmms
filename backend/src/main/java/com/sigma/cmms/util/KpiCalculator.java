@@ -24,10 +24,19 @@ public class KpiCalculator {
     private static final double MINUTES_PER_HOUR = 60.0;
     private static final double FULL = 100.0;
 
+    /**
+     * @param repair reparacion cerrada
+     * @return horas transcurridas entre la falla y el cierre
+     */
     public static double repairHours(RepairInterval repair) {
         return hoursBetween(repair.failureAt(), repair.closedAt());
     }
 
+    /**
+     * @param start momento inicial
+     * @param end momento final
+     * @return horas entre ambos momentos; cero si el orden es invalido o falta un dato
+     */
     public static double hoursBetween(LocalDateTime start, LocalDateTime end) {
         if (start == null || end == null || end.isBefore(start)) {
             return 0.0;
@@ -35,10 +44,20 @@ public class KpiCalculator {
         return Duration.between(start, end).toMinutes() / MINUTES_PER_HOUR;
     }
 
+    /**
+     * @param repairs reparaciones del periodo
+     * @return suma de las horas de reparacion
+     */
     public static double totalRepairHours(List<RepairInterval> repairs) {
         return repairs.stream().mapToDouble(KpiCalculator::repairHours).sum();
     }
 
+    /**
+     * Tiempo medio de reparacion.
+     *
+     * @param repairs reparaciones cerradas del periodo
+     * @return promedio de horas por reparacion, o null si no hubo reparaciones
+     */
     public static Double mttr(List<RepairInterval> repairs) {
         if (repairs.isEmpty()) {
             return null;
@@ -57,6 +76,13 @@ public class KpiCalculator {
         return round1(operatingHours / repairs.size());
     }
 
+    /**
+     * Disponibilidad inherente: MTBF / (MTBF + MTTR).
+     *
+     * @param mtbf tiempo medio entre fallas
+     * @param mttr tiempo medio de reparacion
+     * @return porcentaje de disponibilidad; 100 si no hubo fallas
+     */
     public static Double availability(Double mtbf, Double mttr) {
         if (mtbf == null || mttr == null) {
             return FULL;
@@ -76,11 +102,19 @@ public class KpiCalculator {
         return round1(onTime * FULL / dues.size());
     }
 
+    /**
+     * @param due orden preventiva con vencimiento en el periodo
+     * @return verdadero si se cerro a mas tardar en su fecha compromiso
+     */
     public static boolean closedOnTime(PreventiveDue due) {
         return due.status() == WorkOrderStatus.CERRADA && due.closedAt() != null
                 && !due.closedAt().toLocalDate().isAfter(due.dueDate());
     }
 
+    /**
+     * @param value valor a redondear
+     * @return el valor con un decimal
+     */
     public static double round1(double value) {
         return Math.round(value * 10.0) / 10.0;
     }

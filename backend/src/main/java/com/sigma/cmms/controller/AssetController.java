@@ -41,6 +41,12 @@ public class AssetController {
 
     private final AssetService assetService;
 
+    /**
+     * Busca activos por codigo o nombre, area y estatus.
+     *
+     * @param search texto libre; los filtros nulos no restringen
+     * @return 200 con una pagina de activos ordenada por codigo
+     */
     @Operation(summary = "Busca activos por codigo o nombre, area y estatus")
     @ApiResponse(responseCode = OK, description = "Pagina de activos")
     @GetMapping
@@ -52,6 +58,12 @@ public class AssetController {
         return ResponseEntity.ok(ApiResult.ok(assetService.search(search, area, status, pageable)));
     }
 
+    /**
+     * Consulta la ficha de un activo.
+     *
+     * @param assetId identificador del activo
+     * @return 200 con el activo, o 404 si no existe o fue dado de baja
+     */
     @Operation(summary = "Ficha de un activo")
     @ApiResponse(responseCode = OK, description = "Activo encontrado")
     @ApiResponse(responseCode = "404", description = "El activo no existe")
@@ -60,6 +72,12 @@ public class AssetController {
         return ResponseEntity.ok(ApiResult.ok(assetService.get(assetId)));
     }
 
+    /**
+     * Consulta el historial de ordenes del activo, de la mas reciente a la mas antigua.
+     *
+     * @param assetId identificador del activo
+     * @return 200 con una pagina del historial
+     */
     @Operation(summary = "Historial de ordenes del activo")
     @ApiResponse(responseCode = OK, description = "Pagina del historial")
     @GetMapping("/{assetId}/work-orders")
@@ -68,6 +86,12 @@ public class AssetController {
         return ResponseEntity.ok(ApiResult.ok(assetService.history(assetId, pageable)));
     }
 
+    /**
+     * Registra un activo nuevo. Requiere rol de planeacion.
+     *
+     * @param request datos del activo
+     * @return 201 con la cabecera Location, o 409 si el codigo ya existe
+     */
     @Operation(summary = "Registra un activo")
     @ApiResponse(responseCode = "201", description = "Activo creado")
     @ApiResponse(responseCode = "409", description = "Codigo duplicado")
@@ -80,6 +104,13 @@ public class AssetController {
         return ResponseEntity.created(location).body(ApiResult.ok(created, "Activo registrado"));
     }
 
+    /**
+     * Actualiza todos los datos de un activo. Requiere rol de planeacion.
+     *
+     * @param assetId identificador del activo
+     * @param request datos nuevos
+     * @return 200 con el activo actualizado, o 409 si el codigo pertenece a otro
+     */
     @Operation(summary = "Actualiza un activo")
     @ApiResponse(responseCode = OK, description = "Activo actualizado")
     @PreAuthorize(Authz.CAN_PLAN)
@@ -89,6 +120,12 @@ public class AssetController {
         return ResponseEntity.ok(ApiResult.ok(assetService.update(assetId, request)));
     }
 
+    /**
+     * Da de baja logica un activo. Requiere rol de supervision.
+     *
+     * @param assetId identificador del activo
+     * @return 204 sin contenido, o 422 si el activo tiene ordenes pendientes
+     */
     @Operation(summary = "Baja logica de un activo")
     @ApiResponse(responseCode = "204", description = "Activo dado de baja")
     @ApiResponse(responseCode = "422", description = "El activo tiene ordenes pendientes")
